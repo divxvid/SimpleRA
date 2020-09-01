@@ -13,9 +13,12 @@ void Matrix::load_matrix(string file_name)
 	string row ;
 	int row_number = 0 ;
 	int block_id = 0 ;
+	data_dim = 0;
 
 	while(getline(f, row))
 	{
+		if(row.back() == '\r')
+			row.pop_back() ;
 		stringstream ss(row) ;
 		string word ;
 		while(getline(ss, word, ','))
@@ -28,7 +31,6 @@ void Matrix::load_matrix(string file_name)
 	}
 	f.close();
 	matrix_filename_prefix = "../data/temp/"+matrix_name+"_Block" ;
-	cout << "Matrix filename prefix : " << matrix_filename_prefix << endl ;
 	temp_file_name = "../data/temp/TEMPFILE" ;
 
 	f.open(file_name, fstream::in);
