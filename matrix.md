@@ -22,12 +22,12 @@ to fix the block size to 25. This choice of block size is explained as follows:
 While writing numbers as characters to a file it takes 1 byte/character and we
 were explicitly told that our data will consist of Integer type data which in C++
 takes 4 bytes which when converting into bits is 32 bits. So the values that fit in
-Integer type data ranges from 0 to 232 - 1. 232 - 1 is 4294967295 which is a 10 -
+Integer type data ranges from 0 to 2<sup>32</sup> - 1. 2<sup>32</sup>- 1 is 4294967295 which is a 10 -
 digit number, but when written as a character it takes about 10 bytes. The
 consecutive row values also need to be separated by a comma which itself is
 another character to a file meaning another byte for one number. So, all in all,
 in worst case it takes about 11 bytes per element of a matrix when stored as a
-character file. Dividing 8kB by 11 bytes => ceil( 8 192/11)= 74 5, it isn’t a perfect
+character file. Dividing 8kB by 11 bytes => ceil( 8192/11)= 745, it isn’t a perfect
 square so the closest perfect square <=745 is 729 which is the square of 27,we
 could’ve chosen 27,26 or any number like that but for aesthetic purposes we
 went with 25, so each of our matrix blocks can contain atmost 625 numbers
@@ -48,8 +48,8 @@ We read each block file Block_i into main memory and transpose them
 individually in place and write them back into the same file.
 
 Now we know if in a matrix M, with number of elements per row is x, then if
-we store the matrix in 1-D format M[i][j] becomes M[ i*x + j] and while
-transposing we swap M[i][j] with M[j][i] i.e. M[ j*x +i] keeping the constraint
+we store the matrix in 1-D format M[i][j] becomes M[ (i)*x + j] and while
+transposing we swap M[i][j] with M[j][i] i.e. M[ (j)*x +i] keeping the constraint
 that j > i(Upper triangular matrix is swapped with Lower triangular matrix), the
 exact same principal is followed in this block storage format. The number of
 blocks per row is ceil(Number of elements per row / Block size ) which will be
