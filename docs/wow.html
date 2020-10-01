@@ -1,0 +1,483 @@
+<hr />
+
+<p>marp: true
+theme: gaia
+class: invert</p>
+
+<h2>backgroundColor: black</h2>
+
+<h1>SimpleRA</h1>
+
+<p><em>A laughably-minimalist, integer-only, read-only Relational Database Management System that makes the author question why they ever bothered to write it up!</em></p>
+
+<h2><em>Data Systems, Monsoon 2020</em></h2>
+
+<p>19th August, 2020
+Wednesday</p>
+
+<hr />
+
+<h3>Important Features</h3>
+
+<ul>
+<li>Relational Algebra Operators</li>
+<li>Integers Only</li>
+<li>No update operations</li>
+<li>No aggregate operations</li>
+<li>No nested queries</li>
+<li>No transaction management</li>
+<li>Single thread programming only</li>
+<li>No identifiers should have spaces in them</li>
+</ul>
+
+
+<hr />
+
+<h3>Commands</h3>
+
+<p>There are 2 kinds of commands in this database.</p>
+
+<ul>
+<li>Assignment statements</li>
+<li>Non-assignment statements</li>
+</ul>
+
+
+<p><em>Note: Not all operators have been implemented, some have been omitted for you to implement in later phases</em></p>
+
+<hr />
+
+<h2>Non Assignment Statements</h2>
+
+<p>Non-assginment statements do not create a new table (except load which just loads an existing table) in the process</p>
+
+<ul>
+<li>LOAD</li>
+<li>LIST</li>
+<li>PRINT</li>
+<li>RENAME</li>
+<li>EXPORT</li>
+<li>CLEAR</li>
+<li>QUIT</li>
+</ul>
+
+
+<hr />
+
+<h2>Non Assignment Statements</h2>
+
+<p>The following haven&rsquo;t been implemented
+- INDEX</p>
+
+<hr />
+
+<h3>LOAD</h3>
+
+<p>Syntax:
+<code>
+LOAD &lt;table_name&gt;
+</code>
+- To successfully load a table, there should be a csv file names &lt;table_name>.csv consisiting of comma-seperated integers in the data folder
+- None of the columns in the data file should have the same name
+- every cell in the table should have a value</p>
+
+<p>Run: <code>LOAD A</code></p>
+
+<hr />
+
+<h3>LIST TABLES</h3>
+
+<p>Syntax
+<code>
+LIST TABLES
+</code>
+This command lists all tables that have been loaded or created using assignment statements</p>
+
+<p>Run: <code>LIST TABLES</code>
+Run: <code>LOAD B</code>, <code>LIST TABLES</code></p>
+
+<hr />
+
+<h3>PRINT</h3>
+
+<p>Syntax
+<code>
+PRINT &lt;table_name&gt;
+</code></p>
+
+<ul>
+<li>Displays the first PRINT_COUNT (global variable) rows of the table.</li>
+<li>Less number of rows can be printed if the table has only a few rows</li>
+</ul>
+
+
+<p>Run: <code>PRINT B</code></p>
+
+<hr />
+
+<h3>RENAME</h3>
+
+<p>Syntax
+<code>
+RENAME &lt;toColumnName&gt; TO &lt;fromColumnName&gt; FROM &lt;table_name&gt;
+</code></p>
+
+<ul>
+<li>Naturally &lt;table_name> should be a loaded table in the system and <fromColumnName> should be an exsiting column in the table</li>
+<li><toColumnName> should not be another column in the table</li>
+</ul>
+
+
+<p>Run: <code>RENAME b TO c FROM B</code></p>
+
+<hr />
+
+<h3>EXPORT</h3>
+
+<p>Syntax
+<code>
+EXPORT &lt;table_name&gt;
+</code></p>
+
+<ul>
+<li>All changes made and new tables created, exist only within the system and will be deleted once execution ends (temp file)</li>
+<li>To keep changes made (RENAME and new tables), you have to export the table (data)</li>
+</ul>
+
+
+<p>Run: <code>EXPORT B</code></p>
+
+<hr />
+
+<h3>CLEAR</h3>
+
+<p>Syntax
+<code>
+CLEAR &lt;table_name&gt;
+</code>
+- Removes table from system
+- The table has to have previously existed in the system to remove it
+- If you want to keep any of the changes you&rsquo;ve made to an old table or want to keep the new table, make sure to export !</p>
+
+<p>Run: <code>CLEAR B</code></p>
+
+<hr />
+
+<h3>QUIT</h3>
+
+<p>Syntax
+<code>
+QUIT
+</code></p>
+
+<ul>
+<li>Clear all tables present in the system (<strong><em>WITHOUT EXPORTING THEM</em></strong>)  (temp file - empty)</li>
+</ul>
+
+
+<p>Run: <code>QUIT</code></p>
+
+<hr />
+
+<h3>INDEX*</h3>
+
+<p>Syntax:
+<code>
+INDEX ON &lt;columnName&gt; FROM &lt;table_name&gt; USING &lt;indexing_strategy&gt;
+</code></p>
+
+<p>Where &lt;indexing_strategy> could be
+- <code>BTREE</code> - BTree indexing on column
+- <code>HASH</code> - Index via a hashmap
+- <code>NOTHING</code> - Removes index if present</p>
+
+<hr />
+
+<h3>Questions ?</h3>
+
+<hr />
+
+<h2>Assignment Statements</h2>
+
+<ul>
+<li><p>All assignment statements lead to the creation of a new table.</p></li>
+<li><p>Every statement is of the form <code>&lt;new_table_name&gt; &lt;- &lt;assignment_statement&gt;</code></p></li>
+<li><p>Naturally in all cases, &lt;new_table_name> shouldn&rsquo;t already exist in the system</p></li>
+</ul>
+
+
+<hr />
+
+<h2>Assignment Statements</h2>
+
+<ul>
+<li>CROSS</li>
+<li>PROJECTION</li>
+<li>SELECTION</li>
+</ul>
+
+
+<p>The following haven&rsquo;t been implemented
+- DISTINCT
+- JOIN
+- SORT</p>
+
+<hr />
+
+<h3>CROSS</h3>
+
+<p>Syntax
+<code>
+&lt;new_table_name&gt; &lt;- CROSS &lt;table_name1&gt; &lt;table_name2&gt;
+</code></p>
+
+<ul>
+<li>Both the tables being crossed should exist in the system</li>
+<li>If there are columns with the same names in the two tables, the columns are indexed with the table name. If both tables being crossed are the same, table names are indexed with &lsquo;1&rsquo; and &lsquo;2&rsquo;</li>
+</ul>
+
+
+<p>Run: <code>cross_AA &lt;- CROSS A A</code></p>
+
+<p><code>A(A, B) x A(A, B) -&gt; cross_AA(A1_A, A1_B, A2_A, A2_B)</code></p>
+
+<hr />
+
+<h3>SELECTION</h3>
+
+<p>Syntax
+<code>
+&lt;new_table_name&gt; &lt;- SELECT &lt;condition&gt; FROM &lt;table_name&gt;
+</code></p>
+
+<p>Where <condition> is of either form
+<code>
+&lt;first_column_name&gt; &lt;bin_op&gt; &lt;second_column_name&gt;
+&lt;first_column_name&gt; &lt;bin_op&gt; &lt;int_literal&gt;
+</code></p>
+
+<p>Where &lt;bin_op> can be any operator among {>, &lt;, >=, &lt;=, =>, =&lt;, ==, !=}</p>
+
+<hr />
+
+<ul>
+<li>The selection command only takes one condition at a time</li>
+</ul>
+
+
+<p>Run: <code>R &lt;- SELECT a &gt;= 1 FROM A</code>
+<code>S &lt;- SELECT a &gt; b FROM A</code></p>
+
+<hr />
+
+<h3>PROJECTION</h3>
+
+<p>Syntax
+<code>
+&lt;new_table_name&gt; &lt;- PROJECT &lt;column1&gt;(,&lt;columnN&gt;)* FROM &lt;table_name&gt;
+</code></p>
+
+<ul>
+<li>naturally all columns should be present in the original table</li>
+</ul>
+
+
+<p>Run: <code>C &lt;- PROJECT c FROM A</code></p>
+
+<hr />
+
+<h3>DISTINCT*</h3>
+
+<p>Syntax
+<code>
+&lt;new_table_name&gt; &lt;- DISTINCT &lt;table_name&gt;
+</code></p>
+
+<ul>
+<li>naturally table should exist</li>
+</ul>
+
+
+<p>Exmample: <code>D &lt;- DISTINCT A</code></p>
+
+<hr />
+
+<h3>JOIN*</h3>
+
+<p>Syntax
+<code>
+&lt;new_relation_name&gt; &lt;- JOIN &lt;table1&gt;, &lt;table2&gt; ON &lt;column1&gt; &lt;bin_op&gt; &lt;column2&gt;
+</code></p>
+
+<p>Where &lt;bin_op> means the same as it does in the SELECT operator</p>
+
+<ul>
+<li>Implicitly assumes <column1> is from <table1> and <column2> if from <table2></li>
+</ul>
+
+
+<p>Example: <code>J &lt;- JOIN A, B ON a == a</code></p>
+
+<hr />
+
+<h3>SORT*</h3>
+
+<p>Syntax
+<code>
+&lt;new_table_name&gt; &lt;- SORT &lt;table_name&gt; BY &lt;column_name&gt; IN &lt;sorting_order&gt;
+</code></p>
+
+<p>Where &lt;sorting_order> can be <code>ASC</code> or <code>DESC</code></p>
+
+<p>Example: <code>S &lt;- SORT A BY b IN ASC</code></p>
+
+<hr />
+
+<h3>SOURCE</h3>
+
+<p>Syntax
+<code>
+SOURCE &lt;query_name&gt;
+</code>
+- Special command that takes in a file script from the data directory
+- file name should end in &ldquo;.ra&rdquo; indicating it&rsquo;s a query file
+- File to be present in the data folder
+- Used in last phase of project</p>
+
+<hr />
+
+<h3>Internals</h3>
+
+<ul>
+<li><p>Buffer Manager</p></li>
+<li><p>Cursors</p></li>
+<li><p>Tables</p></li>
+<li><p>Executors</p></li>
+</ul>
+
+
+<hr />
+
+<h3>Command Execution Flow</h3>
+
+<p><img src="flow.png" alt="" /></p>
+
+<p>Run: <code>LOAD A</code> with debugger</p>
+
+<p>see: load.cpp</p>
+
+<hr />
+
+<h3>Syntactic Parser</h3>
+
+<ul>
+<li>Splits the query into query units</li>
+</ul>
+
+
+<p>see: syntacticParser.h syntacticParser.cpp</p>
+
+<h3>Semantic Parser</h3>
+
+<ul>
+<li>Makes sure your query makes semantic sense</li>
+</ul>
+
+
+<p>see: semanticParser.h semanticParser.cpp</p>
+
+<hr />
+
+<h3>Executors</h3>
+
+<p>Every command(COMMAND) has a file in the executors directory, within that directory you&rsquo;ll find 3 functions</p>
+
+<p><code>
+syntacticParseCOMMAND
+semanticParseCOMMAND
+executeCOMMAND
+</code></p>
+
+<hr />
+
+<h3>Buffer Manager</h3>
+
+<ul>
+<li><p>Load splits and stores the table into blocks. For this we utilise the Buffer Manager</p></li>
+<li><p>Buffer Manager follows a FIFO paradigm. Essentially a queue</p></li>
+</ul>
+
+
+<hr />
+
+<h3>Table Catalogue</h3>
+
+<ul>
+<li>The table catalogue is an index of tables currently loaded into the system</li>
+</ul>
+
+
+<hr />
+
+<h3>Cursors</h3>
+
+<p>A cursor is an object that acts like a pointer in a table. To read from a table, you need to declare a cursor.</p>
+
+<p><img src="cursor.png" alt="" /></p>
+
+<p>Run: <code>R &lt;- SELECT a == 1 FROM A</code> with debugger</p>
+
+<hr />
+
+<h3>Logger</h3>
+
+<p>Every function call is logged in file names &ldquo;log&rdquo;</p>
+
+<hr />
+
+<h2>Project*</h2>
+
+<ul>
+<li>Phase 1: Code Familiarity (to be released today/tomorrow max)</li>
+<li>Phase 2: 2 Phase Merge Sort</li>
+<li>Phase 3: Indexing</li>
+<li>Phase 4: Indexing Optimized Operators</li>
+<li>Phase 4: Optimisation (SOURCE)</li>
+</ul>
+
+
+<p><em>Note: may include duplicate elimination</em>
+* Tentative</p>
+
+<hr />
+
+<h2>Project Rules</h2>
+
+<ul>
+<li><strong>Plagiarism: F</strong></li>
+<li>Not sticking to submission guidelines will lead to penalties and at times to scoring 0</li>
+<li>Project phases build on top of each other, failing to do one phase may hinder the rest</li>
+<li>If for any reason you fail to complete the project on time, please mail the Prof directly for extensions and not the TAs, the TAs have no jurisdiction in these cases</li>
+</ul>
+
+
+<hr />
+
+<h2>Adminstrative Rules</h2>
+
+<ul>
+<li>No informal contact with the TAs, you may post on Moodle regarding any doubts. A forum will be created for the same</li>
+<li>TA Hours have been updated on Moodle</li>
+<li>If you need to contact the TAs for matters that don&rsquo;t concern the whole class you may mail us here - datasystems_tas_m20@IIITAPhyd.onmicrosoft.com</li>
+</ul>
+
+
+<hr />
+
+<h2>References</h2>
+
+<ul>
+<li>GitHub Repo - <a href="https://github.com/SimpleRA/SimpleRA">SimpleRA</a></li>
+<li>Build and run instructions will be provided later</li>
+</ul>
+
