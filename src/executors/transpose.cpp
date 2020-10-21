@@ -17,6 +17,7 @@ bool syntacticParseTRANSPOSE()
 
 bool semanticParseTRANSPOSE()
 {
+    logger.log("semanticParseTranspose") ;
    	if(loadedMatrices.count(tokenizedQuery[1]) == 0)
 	{
 		//Matrix not found
