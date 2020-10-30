@@ -12,16 +12,6 @@ struct BPlusNode
 
 	BPlusNode* next; // for the leaf doubly linked list
 	BPlusNode* prev;
-	/*
-	union pointers
-	{
-		vector<BPlusNode*> children ; // to store the children of internal nodes.
-		vector<int> values ; // to store the values in the leaf nodes.
-
-		pointers() {}
-		~pointers() {}
-	} children_or_values ;
-	*/
 
 	void init_internal_node()
 	{
@@ -50,6 +40,7 @@ class BPlusTree
 	BPlusNode* insert_p(BPlusNode*, int key, int value) ;
 	void delete_nodes(BPlusNode*) ;
 	void traverse_p(BPlusNode*) ;
+	int get_p(BPlusNode*, int) ;
 public:
 	BPlusTree() 
 	{
@@ -73,10 +64,50 @@ public:
 	 * responsible for creating a new root node.
 	 * */
 	void insert(int key, int value) ;
-	void find(int key) ;
 	void traverse() ;
 	void print_content() ;
+	void print_content_reverse() ;
+	int get(int key) ;
 };
+
+int BPlusTree::get_p(BPlusNode* node, int key)
+{
+	if(node == nullptr)
+		return -1 ;
+
+	if(node->is_leaf)
+	{
+		auto pos = lower_bound(node->keys.begin(), node->keys.end(), key) ;
+		if(pos == node->keys.end() || *pos != key)
+			return -1 ;
+		int index = pos - node->keys.begin() ;
+		return node->values[index] ;
+	}
+	int pos = upper_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin() ;
+	return get_p(node->children[pos], key) ;
+}
+
+int BPlusTree::get(int key)
+{
+	return get_p(root, key) ;
+}
+
+void BPlusTree::print_content_reverse()
+{
+	BPlusNode* trav = root ;
+	while(trav != nullptr && !trav->is_leaf)
+		trav = trav->children.back() ;
+	if(trav == nullptr)
+		return ;
+
+	while(trav != nullptr)
+	{
+		for(int i = trav->keys.size()-1; i >= 0; --i)
+			cout << trav->keys[i] << ' ' << trav->values[i] << '\n' ;
+
+		trav = trav->prev ;
+	}
+}
 
 void BPlusTree::print_content()
 {
@@ -164,11 +195,6 @@ BPlusNode* BPlusTree::insert_p(BPlusNode* node, int key, int value)
 	//Find the child where we have to descend.
 	
 	int index = upper_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin() ;
-	cout << "keys : " ;
-	for(int x : node->keys)
-		cout << x << ' ';
-	cout << '\n' ;
-	cout << "Inserting into child : " << index << '\n' ;
 
 	BPlusNode* &child = node->children[index] ;
 	child = insert_p(child, key, value) ;
@@ -252,27 +278,17 @@ void BPlusTree::insert(int key, int value)
 {
 	BPlusNode* child = insert_p(root, key, value) ;		
 	this->root = child ;
-	cout << "After insert details :\n" ;
-	cout << "Key size in child : " << child->keys.size() << '\n' ;
-	cout << "Needs split at root : " << (child->needs_split) << '\n' ;
 	// TODO: Handle the logic for creating a new node here.
 	if(child->needs_split)
 	{
 		//turn off the flag.
 		child->needs_split = false ;
-		
-		cout << "leaf keys : " ;
-		for(int x : child->keys)
-			cout << x << ' ' ;
-		cout << '\n' ;
 
 		// NOTE: if the child that we need to split is a leaf node, then we have to change the next and prev pointers as well.
 
 		const int limit = child->keys.size() ;
 		int mid_index = limit/2;
 		int mid_key = child->keys[mid_index] ;
-		cout << "CREATING NEW ROOT\n" ;
-		cout << "Mid Key : " << mid_key << '\n' ;
 		
 		//creating a new node
 		BPlusNode* node = new BPlusNode() ; // This will be our new root.
@@ -355,5 +371,13 @@ int main()
 	tree.insert(9, 90) ;
 
 	tree.traverse() ;
+	cout << "--------------------------\n" ;
 	tree.print_content() ;
+	cout << "--------------------------\n" ;
+	tree.print_content_reverse();
+	cout << "--------------------------\n" ;
+
+	cout << tree.get(2) << '\n' ;
+	cout << tree.get(4) << '\n' ;
+	cout << tree.get(100) << '\n' ;
 }
