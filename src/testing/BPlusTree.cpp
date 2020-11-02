@@ -218,6 +218,12 @@ BPlusNode* BPlusTree::insert_p(BPlusNode* node, int key, int value)
 		if(child->is_leaf)
 		{
 			new_node->init_leaf_node() ;
+			BPlusNode* next_to_curr_leaf = child->next ;
+			if(next_to_curr_leaf != nullptr)
+			{
+				new_node->next = next_to_curr_leaf ;
+				next_to_curr_leaf->prev= new_node ;
+			}
 			new_node->prev = child ;
 			child->next = new_node ;
 			
@@ -359,16 +365,24 @@ void BPlusTree::insert(int key, int value)
 
 int main()
 {
-	BPlusTree tree(4, 3) ;
+	BPlusTree tree(3, 3) ;
+	tree.insert(9, 90) ;
 	tree.insert(1, 10) ;
-	tree.insert(2, 20) ;
+	tree.insert(12, 120) ;
 	tree.insert(3, 30) ;
 	tree.insert(4, 40) ;
+	tree.insert(20, 200) ;
+	tree.insert(13, 130) ;
+	tree.insert(18, 180) ;
 	tree.insert(5, 50) ;
 	tree.insert(6, 60) ;
-	tree.insert(7, 70) ;
-	tree.insert(8, 80) ;
-	tree.insert(9, 90) ;
+	tree.insert(12, 240) ;
+	tree.insert(12, 241) ;
+	tree.insert(12, 242) ;
+	tree.insert(12, 243) ;
+	tree.insert(12, 244) ;
+	tree.insert(11, 110) ;
+
 
 	tree.traverse() ;
 	cout << "--------------------------\n" ;
@@ -379,5 +393,7 @@ int main()
 
 	cout << tree.get(2) << '\n' ;
 	cout << tree.get(4) << '\n' ;
+	cout << tree.get(48) << '\n' ;
+	cout << tree.get(24) << '\n' ;
 	cout << tree.get(100) << '\n' ;
 }
