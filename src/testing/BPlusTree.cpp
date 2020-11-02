@@ -30,6 +30,8 @@ struct BPlusNode
 class BPlusTree
 {
 	int internal_fanout, leaf_fanout ;
+	int number_of_elements ;
+	int maximal_elements_reached ;
 	BPlusNode* root ;
 
 	/*
@@ -41,18 +43,24 @@ class BPlusTree
 	void delete_nodes(BPlusNode*) ;
 	void traverse_p(BPlusNode*) ;
 	int get_p(BPlusNode*, int) ;
+	void erase_p(BPlusNode*, int key) ;
+	void reconstruct() ;
 public:
 	BPlusTree() 
 	{
 		root = nullptr ;
 		internal_fanout = 10 ;
 		leaf_fanout = 10 ;
+		number_of_elements = 0 ;
+		maximal_elements_reached = 0 ;
 	}
 	BPlusTree(int internal_fo, int leaf_fo)
 	{
 		root = nullptr ;
 		internal_fanout = internal_fo ;
 		leaf_fanout = leaf_fo ;
+		number_of_elements = 0 ;
+		maximal_elements_reached = 0 ;
 	}
 	~BPlusTree()
 	{
@@ -68,7 +76,68 @@ public:
 	void print_content() ;
 	void print_content_reverse() ;
 	int get(int key) ;
+	void erase(int key) ;
+	int size() ;
 };
+
+int BPlusTree::size()
+{
+	return number_of_elements ;
+}
+
+void BPlusTree::reconstruct()
+{
+	BPlusNode* old_root = this->root ;	
+	BPlusNode* trav = this->root ;
+	this->root = nullptr ; 
+	this->number_of_elements = 0 ;
+	this->maximal_elements_reached = 0 ;
+	while(trav != nullptr && !trav->is_leaf)
+		trav = trav->children[0] ;
+	if(trav == nullptr)
+		return ;
+
+	while(trav != nullptr)
+	{
+		for(int i = 0; i < trav->keys.size(); ++i)
+			this->insert(trav->keys[i], trav->values[i]) ;
+		trav = trav->next ;
+	}
+	delete_nodes(old_root) ;
+}
+
+void BPlusTree::erase_p(BPlusNode* node, int key)
+{
+	if(node == nullptr)
+		return ;
+
+	if(node->is_leaf)
+	{
+		auto pos = lower_bound(node->keys.begin(), node->keys.end(), key) ;
+		if(pos == node->keys.end() || *pos != key)
+			return ;
+		int index = pos - node->keys.begin() ;
+		node->keys.erase(node->keys.begin()+index);
+		node->values.erase(node->values.begin()+index);
+		this->number_of_elements-- ;
+		return ;
+	}
+
+	int pos = upper_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin() ;
+	erase_p(node->children[pos], key) ;
+}
+
+void BPlusTree::erase(int key)
+{
+	erase_p(root, key) ;
+
+	if(number_of_elements < maximal_elements_reached/2)
+	{
+		//reconstrct the tree.
+		reconstruct() ;
+		this->maximal_elements_reached = this->number_of_elements ;
+	}
+}
 
 int BPlusTree::get_p(BPlusNode* node, int key)
 {
@@ -361,6 +430,8 @@ void BPlusTree::insert(int key, int value)
 		}
 		this->root = node ;
 	}
+	++number_of_elements ;
+	maximal_elements_reached = max(maximal_elements_reached, number_of_elements) ;
 }
 
 int main()
@@ -391,9 +462,33 @@ int main()
 	tree.print_content_reverse();
 	cout << "--------------------------\n" ;
 
-	cout << tree.get(2) << '\n' ;
-	cout << tree.get(4) << '\n' ;
-	cout << tree.get(48) << '\n' ;
-	cout << tree.get(24) << '\n' ;
-	cout << tree.get(100) << '\n' ;
+	cout << "size : " << tree.size() << '\n' ;
+	cout << tree.get(13) << '\n' ;
+	tree.erase(13) ;
+	cout << tree.get(13) << '\n' ;
+	cout << tree.get(5) << '\n' ;
+	tree.erase(5) ;
+	cout << tree.get(5) << '\n' ;
+
+	tree.erase(12) ;
+	tree.erase(12) ;
+	tree.erase(12) ;
+	tree.erase(12) ;
+	tree.erase(1) ;
+	tree.erase(9) ;
+	tree.erase(6) ;
+	tree.erase(18) ;
+	cout << "size : " << tree.size() << '\n' ;
+
+	cout << tree.get(11) << '\n';
+	tree.erase(11) ;
+	cout << tree.get(11) << '\n';
+
+	tree.erase(3) ;
+	tree.erase(4) ;
+	tree.erase(12) ;
+	cout << "size : " << tree.size() << '\n' ;
+
+	tree.print_content() ;
+	tree.erase(12);
 }
