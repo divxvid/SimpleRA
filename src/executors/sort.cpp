@@ -7,13 +7,52 @@
  * 
  * sorting_order = ASC | DESC 
  */
-const int BUFF_SIZE = 16; 
+int BUFF_SIZE = 16; 
 bool syntacticParseSORT(){
     logger.log("syntacticParseSORT");
+	/*
     if(tokenizedQuery.size()!= 8 || tokenizedQuery[4] != "BY" || tokenizedQuery[6] != "IN"){
         cout<<"SYNTAX ERROR"<<endl;
         return false;
     }
+    parsedQuery.queryType = SORT;
+    parsedQuery.sortResultRelationName = tokenizedQuery[0];
+    parsedQuery.sortColumnName = tokenizedQuery[5];
+    parsedQuery.sortRelationName = tokenizedQuery[3];
+    string sortingStrateg = tokenizedQuery[7];
+    if(sortingStrateg == "ASC")
+        parsedQuery.sortingStrategy = ASC;
+    else if(sortingStrateg == "DESC")
+        parsedQuery.sortingStrategy = DESC;
+    else{
+        cout<<"SYNTAX ERROR"<<endl;
+        return false;
+    }
+    return true;
+	*/
+	bool ok = false ;
+	if(tokenizedQuery.size() == 10 && tokenizedQuery[4] == "BY" && tokenizedQuery[6] == "IN" && tokenizedQuery[8] == "BUFFER")
+	{
+		ok = true ;
+		try
+		{
+			BUFF_SIZE = stoi(tokenizedQuery[9]) * (int)BLOCK_SIZE ;
+			cout << "Using new buffer size : " << BUFF_SIZE << endl ;
+		} catch(...)
+		{
+			ok = false ;	
+		}
+	} else if(tokenizedQuery.size() == 8 && tokenizedQuery[4] == "BY" && tokenizedQuery[6] == "IN")
+	{
+		ok = true ;
+	}
+
+	if(!ok)
+	{
+		cout << "SYNTAX ERROR" << endl ;
+		return false ;
+	}
+
     parsedQuery.queryType = SORT;
     parsedQuery.sortResultRelationName = tokenizedQuery[0];
     parsedQuery.sortColumnName = tokenizedQuery[5];
