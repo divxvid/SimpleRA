@@ -1,5 +1,6 @@
 #include"executor.h"
 #include "Matrix.h"
+#include "BPlusTree.h"
 
 extern bool is_matrix;
 extern float BLOCK_SIZE;
@@ -9,3 +10,4 @@ extern vector<string> tokenizedQuery;
 extern ParsedQuery parsedQuery;
 extern TableCatalogue tableCatalogue;
 extern BufferManager bufferManager;
+extern map<pair<string, string>, BPlusTree*> indexedColumns ;

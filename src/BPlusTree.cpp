@@ -1,88 +1,6 @@
-#include <bits/stdc++.h>
-using namespace std ;
+#include "global.h" 
 
-struct BPlusNode
-{
-	bool is_leaf ; // determines whether the node is a leaf node or an internal node.	
-	bool needs_split ; // determines whether the nodes requires a split or not ;
-
-	vector<int> keys ; // stores the keys
-	vector<BPlusNode*> children ; // to store the children of internal nodes.
-	vector<int> values ; // to store the values in the leaf nodes.
-
-	BPlusNode* next; // for the leaf doubly linked list
-	BPlusNode* prev;
-
-	void init_internal_node()
-	{
-		is_leaf = false ;
-		needs_split = false ;
-	}
-	void init_leaf_node()
-	{
-		is_leaf = true ;
-		needs_split = false ;
-		next = nullptr ;
-		prev = nullptr ;
-	}
-};
-
-class BPlusTree
-{
-	int internal_fanout, leaf_fanout ;
-	int number_of_elements ;
-	int numbers_deleted ;
-	int maximal_elements_reached ;
-	BPlusNode* root ;
-
-	/*
-	 * This is a private function that performs the actual insert and 
-	 * return a boolean value that decides whether the node where the insert
-	 * is done has overflowed or not. If It has overflowed, then it needs to be split
-	 * */
-	BPlusNode* insert_p(BPlusNode*, int key, int value) ;
-	void delete_nodes(BPlusNode*) ;
-	void traverse_p(BPlusNode*) ;
-	int get_p(BPlusNode*, int) ;
-	void erase_p(BPlusNode*, int key) ;
-	void reconstruct() ;
-public:
-	BPlusTree() 
-	{
-		root = nullptr ;
-		internal_fanout = 10 ;
-		leaf_fanout = 10 ;
-		number_of_elements = 0 ;
-		maximal_elements_reached = 0 ;
-		numbers_deleted = 0 ;
-	}
-	BPlusTree(int internal_fo, int leaf_fo)
-	{
-		root = nullptr ;
-		internal_fanout = internal_fo ;
-		leaf_fanout = leaf_fo ;
-		number_of_elements = 0 ;
-		maximal_elements_reached = 0 ;
-		numbers_deleted = 0 ;
-	}
-	~BPlusTree()
-	{
-		delete_nodes(root) ;
-	}
-	/*
-	 * This is a public function that takes in a key and a value, and uses the private
-	 * insert function to insert value value. If the root has overflown, this function is
-	 * responsible for creating a new root node.
-	 * */
-	void insert(int key, int value) ;
-	void traverse() ;
-	void print_content() ;
-	void print_content_reverse() ;
-	int get(int key) ;
-	void erase(int key) ;
-	int size() ;
-};
-
+map<pair<string, string>, BPlusTree*> indexedColumns ;
 int BPlusTree::size()
 {
 	return number_of_elements ;
@@ -153,16 +71,16 @@ void BPlusTree::erase(int key)
 	}
 }
 
-int BPlusTree::get_p(BPlusNode* node, int key)
+pair<int, int> BPlusTree::get_p(BPlusNode* node, int key)
 {
 	if(node == nullptr)
-		return -1 ;
+		return {-1, -1} ;
 
 	if(node->is_leaf)
 	{
 		auto pos = lower_bound(node->keys.begin(), node->keys.end(), key) ;
 		if(pos == node->keys.end() || *pos != key)
-			return -1 ;
+			return {-1, -1} ;
 		int index = pos - node->keys.begin() ;
 		return node->values[index] ;
 	}
@@ -170,7 +88,7 @@ int BPlusTree::get_p(BPlusNode* node, int key)
 	return get_p(node->children[pos], key) ;
 }
 
-int BPlusTree::get(int key)
+pair<int ,int> BPlusTree::get(int key)
 {
 	return get_p(root, key) ;
 }
@@ -186,7 +104,7 @@ void BPlusTree::print_content_reverse()
 	while(trav != nullptr)
 	{
 		for(int i = trav->keys.size()-1; i >= 0; --i)
-			cout << trav->keys[i] << ' ' << trav->values[i] << '\n' ;
+			cout << trav->keys[i] << " <" << trav->values[i].first << ' ' << trav->values[i].second << ">\n" ;
 
 		trav = trav->prev ;
 	}
@@ -203,7 +121,7 @@ void BPlusTree::print_content()
 	while(trav != nullptr)
 	{
 		for(int i = 0; i < trav->keys.size(); ++i)
-			cout << trav->keys[i] << ' ' << trav->values[i] << '\n' ;
+			cout << trav->keys[i] << " <" << trav->values[i].first << ' ' << trav->values[i].second << ">\n" ;
 
 		trav = trav->next ;
 	}
@@ -245,7 +163,7 @@ void BPlusTree::delete_nodes(BPlusNode* node)
 	delete node ;
 }
 
-BPlusNode* BPlusTree::insert_p(BPlusNode* node, int key, int value)
+BPlusNode* BPlusTree::insert_p(BPlusNode* node, int key, pair<int, int> value)
 {
 	//If we need to allocate a new node.
 	if(node == nullptr)
@@ -363,7 +281,7 @@ BPlusNode* BPlusTree::insert_p(BPlusNode* node, int key, int value)
 	return node ;
 }
 
-void BPlusTree::insert(int key, int value)
+void BPlusTree::insert(int key, pair<int ,int> value)
 {
 	BPlusNode* child = insert_p(root, key, value) ;		
 	this->root = child ;
@@ -446,63 +364,4 @@ void BPlusTree::insert(int key, int value)
 	}
 	++number_of_elements ;
 	maximal_elements_reached = max(maximal_elements_reached, number_of_elements) ;
-}
-
-int main()
-{
-	BPlusTree tree(3, 3) ;
-	tree.insert(9, 90) ;
-	tree.insert(1, 10) ;
-	tree.insert(12, 120) ;
-	tree.insert(3, 30) ;
-	tree.insert(4, 40) ;
-	tree.insert(20, 200) ;
-	tree.insert(13, 130) ;
-	tree.insert(18, 180) ;
-	tree.insert(5, 50) ;
-	tree.insert(6, 60) ;
-	tree.insert(12, 240) ;
-	tree.insert(12, 241) ;
-	tree.insert(12, 242) ;
-	tree.insert(12, 243) ;
-	tree.insert(12, 244) ;
-	tree.insert(11, 110) ;
-
-
-	tree.traverse() ;
-	cout << "--------------------------\n" ;
-	tree.print_content() ;
-	cout << "--------------------------\n" ;
-	tree.print_content_reverse();
-	cout << "--------------------------\n" ;
-
-	cout << "size : " << tree.size() << '\n' ;
-	cout << tree.get(13) << '\n' ;
-	tree.erase(13) ;
-	cout << tree.get(13) << '\n' ;
-	cout << tree.get(5) << '\n' ;
-	tree.erase(5) ;
-	cout << tree.get(5) << '\n' ;
-
-	tree.erase(12) ;
-	tree.erase(12) ;
-	tree.erase(12) ;
-	tree.erase(12) ;
-	tree.erase(1) ;
-	tree.erase(9) ;
-	tree.erase(6) ;
-	tree.erase(18) ;
-	cout << "size : " << tree.size() << '\n' ;
-
-	cout << tree.get(11) << '\n';
-	tree.erase(11) ;
-	cout << tree.get(11) << '\n';
-
-	tree.erase(3) ;
-	tree.erase(4) ;
-	tree.erase(12) ;
-	cout << "size : " << tree.size() << '\n' ;
-
-	tree.print_content() ;
-	tree.erase(12);
 }

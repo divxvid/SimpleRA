@@ -4,6 +4,10 @@
  * SYNTAX: INDEX ON column_name FROM relation_name USING indexing_strategy
  * indexing_strategy: ASC | DESC | NOTHING
  */
+
+// TODO : If the table is already indexed, then do something about it .
+
+int default_fanout = 10 ;
 bool syntacticParseINDEX()
 {
     logger.log("syntacticParseINDEX");
@@ -54,5 +58,42 @@ bool semanticParseINDEX()
 void executeINDEX()
 {
     logger.log("executeINDEX");
+	if(parsedQuery.indexingStrategy == NOTHING)
+		return ;
+	if(parsedQuery.indexingStrategy == HASH)
+	{
+		cout << "INDEX USING HASHING IS NOT IMPLEMENTED YET... FALLING BACK TO B+ TREE INDEXING" << endl ;
+	}
+
+	//this is the domain of the B+ Tree indexing.
+	BPlusTree* index = new BPlusTree(default_fanout, default_fanout);
+	Table* table = tableCatalogue.getTable(parsedQuery.indexRelationName) ;			
+	const int num_pages = table->blockCount ;
+	int col_idx = -1 ;
+	for(string s : table->columns)
+	{
+		++col_idx ;
+		if(s == parsedQuery.indexColumnName)
+		{
+			break ;
+		}
+	}
+	for(int page_number = 0; page_number < num_pages; ++page_number)
+	{
+		Page page = bufferManager.getPage(parsedQuery.indexRelationName, page_number);
+		int i = 0 ;
+		while(true)
+		{
+			vector<int> row = page.getRow(i) ;
+			if(row.empty()) break ;
+			int key = row[col_idx] ;		
+			index->insert(key, make_pair(page_number, i));
+			++i ;
+		}	
+	}
+	table->indexedColumn = parsedQuery.indexColumnName ;	
+	indexedColumns[make_pair(parsedQuery.indexRelationName, parsedQuery.indexColumnName)] = index ;
+	cout << "INDEX CREATION SUCCESSFUL" << endl ;
+	default_fanout = 10 ; //resetting it back to it's default.
     return;
 }

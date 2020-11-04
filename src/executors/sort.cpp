@@ -316,5 +316,6 @@ void executeSORT(){
 
     system("rm -rf ../data/temp/SORTTEMP_*");
     cout << "TABLE SORTED\n" ;
+	BUFF_SIZE = 16 ; //resetting it back to it's default
     return;
 }

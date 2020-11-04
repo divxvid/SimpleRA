@@ -61,4 +61,9 @@ int main(void)
 
         doCommand();
     }
+
+	for(auto it = indexedColumns.begin(); it != indexedColumns.end(); ++it)
+	{
+		delete it->second ;
+	}
 }
