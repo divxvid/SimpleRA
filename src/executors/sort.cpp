@@ -274,47 +274,82 @@ void executeSORT(){
     bool is_ascending = parsedQuery.sortingStrategy == ASC ;
 
     Table* resultantTable = new Table(parsedQuery.sortResultRelationName, columns);
+	auto it = indexedColumns.find(make_pair(parsedQuery.sortRelationName, parsedQuery.sortColumnName));
+	if(it != indexedColumns.end())
+	{
+		cout << "USING INDEX TO SORT" << endl ;
+		BPlusTree* tree = it->second ;
+		BPlusNode* itr ;
+		if(is_ascending)
+		{
+			itr = tree->getForwardRecordIterator() ;
+			while(itr != nullptr)
+			{
+				for(pair<int, int>& p : itr->values)
+				{
+					Page page = bufferManager.getPage(parsedQuery.sortRelationName, p.first);	
+					resultantTable->writeRow<int>(page.getRow(p.second));
+				}
+				itr = tree->next(itr, is_ascending);
+			}
+		} else
+		{
+			itr = tree->getReverseRecordIterator() ;
+			while(itr != nullptr)
+			{
+				for(int i = itr->values.size()-1; i >= 0; --i)
+				{
+					pair<int, int>& p = itr->values[i] ;
+					Page page = bufferManager.getPage(parsedQuery.sortRelationName, p.first);	
+					resultantTable->writeRow<int>(page.getRow(p.second));
+				}
+				itr = tree->next(itr, is_ascending);
+			}
+		}
+	} else 
+	{
 
-    Cursor cursor(parsedQuery.sortRelationName, 0) ;
-    int column_number = -1 ;
-    for(int i = 0; i < columns.size(); ++i)
-    {
-        if(columns[i] == parsedQuery.sortColumnName)
-        {
-            column_number = i ;
-            break ;
-        }
-    }
+		Cursor cursor(parsedQuery.sortRelationName, 0) ;
+		int column_number = -1 ;
+		for(int i = 0; i < columns.size(); ++i)
+		{
+			if(columns[i] == parsedQuery.sortColumnName)
+			{
+				column_number = i ;
+				break ;
+			}
+		}
 
-    int block_number = 0 ;
-    vector<vector<int>> rows_in_page ;
-    for(int i = 0 ; i < table.rowCount; ++i)
-    {
-        vector<int> row = cursor.getNext() ;
-        rows_in_page.push_back(row) ;
-        if((i+1) % table.maxRowsPerBlock == 0)
-        {
-            const string f_name = temp_file_prefix + to_string(block_number);
-            vector<vector<int>> sorted_contents = sort_page_contents(rows_in_page, column_number, is_ascending) ;
-            write_to_file(sorted_contents, f_name) ;
-            rows_in_page.clear() ;
-            ++block_number ;
-        }
-    }
-    if(!rows_in_page.empty())
-    {
-        const string f_name = temp_file_prefix + to_string(block_number);
-        vector<vector<int>> sorted_contents = sort_page_contents(rows_in_page, column_number, is_ascending) ;
-        write_to_file(sorted_contents, f_name) ;
-        rows_in_page.clear() ;
-        ++block_number ;
-    }
+		int block_number = 0 ;
+		vector<vector<int>> rows_in_page ;
+		for(int i = 0 ; i < table.rowCount; ++i)
+		{
+			vector<int> row = cursor.getNext() ;
+			rows_in_page.push_back(row) ;
+			if((i+1) % table.maxRowsPerBlock == 0)
+			{
+				const string f_name = temp_file_prefix + to_string(block_number);
+				vector<vector<int>> sorted_contents = sort_page_contents(rows_in_page, column_number, is_ascending) ;
+				write_to_file(sorted_contents, f_name) ;
+				rows_in_page.clear() ;
+				++block_number ;
+			}
+		}
+		if(!rows_in_page.empty())
+		{
+			const string f_name = temp_file_prefix + to_string(block_number);
+			vector<vector<int>> sorted_contents = sort_page_contents(rows_in_page, column_number, is_ascending) ;
+			write_to_file(sorted_contents, f_name) ;
+			rows_in_page.clear() ;
+			++block_number ;
+		}
 
-    k_way_merge_sort(resultantTable, temp_file_prefix, block_number, column_number, BUFF_SIZE, is_ascending) ;
-    resultantTable->blockify();
-    tableCatalogue.insertTable(resultantTable) ;
+		k_way_merge_sort(resultantTable, temp_file_prefix, block_number, column_number, BUFF_SIZE, is_ascending) ;
 
-    system("rm -rf ../data/temp/SORTTEMP_*");
+		system("rm -rf ../data/temp/SORTTEMP_*");
+	}
+	resultantTable->blockify();
+	tableCatalogue.insertTable(resultantTable) ;
     cout << "TABLE SORTED\n" ;
 	BUFF_SIZE = 16 ; //resetting it back to it's default
     return;

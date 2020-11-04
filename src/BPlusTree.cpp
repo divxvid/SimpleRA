@@ -127,6 +127,31 @@ void BPlusTree::print_content()
 	}
 }
 
+BPlusNode* BPlusTree::getForwardRecordIterator()
+{
+	BPlusNode* trav = root ;
+	while(trav != nullptr && !trav->is_leaf)
+		trav = trav->children[0] ;
+	return trav ; 
+}
+
+BPlusNode* BPlusTree::getReverseRecordIterator()
+{
+	BPlusNode* trav = root ;
+	while(trav != nullptr && !trav->is_leaf)
+		trav = trav->children.back() ;
+	return trav ;
+}
+
+BPlusNode* BPlusTree::next(BPlusNode* iterator, bool forward)
+{
+	if(iterator == nullptr) return nullptr ;	
+	if(forward)
+		return iterator->next ;
+	else
+		return iterator->prev ;
+}
+
 void BPlusTree::traverse_p(BPlusNode* node)
 {
 	if(node == nullptr)

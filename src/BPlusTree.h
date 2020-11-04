@@ -83,6 +83,9 @@ public:
 	pair<int, int> get(int key) ;
 	void erase(int key) ;
 	int size() ;
+	BPlusNode* getReverseRecordIterator();
+	BPlusNode* getForwardRecordIterator();
+	BPlusNode* next(BPlusNode* iterator, bool forward);
 };
 
 //this map stores the pointer to the Index tree that was created on some <table name, column name>.
