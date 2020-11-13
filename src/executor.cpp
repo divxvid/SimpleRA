@@ -18,6 +18,7 @@ void executeCommand(){
         case SORT: executeSORT(); break;
         case SOURCE: executeSOURCE(); break;
 		case TRANSPOSE: executeTRANSPOSE(); break ;
+		case INSERT: executeINSERT(); break ;
         default: cout<<"PARSING ERROR"<<endl;
     }
 

@@ -29,6 +29,8 @@ bool syntacticParse()
         return syntacticParseSOURCE();
 	else if(possibleQueryType == "TRANSPOSE")
 		return syntacticParseTRANSPOSE();
+	else if(possibleQueryType == "INSERT")
+		return syntacticParseINSERT() ;
     else
     {
         string resultantRelationName = possibleQueryType;

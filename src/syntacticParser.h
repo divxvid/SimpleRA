@@ -19,6 +19,7 @@ enum QueryType
     SORT,
     SOURCE,
 	TRANSPOSE,
+	INSERT,
     UNDETERMINED
 };
 
@@ -102,6 +103,9 @@ public:
 
     string sourceFileName = "";
 
+	string insertionRelationName = "";
+	vector<string> insertionValues ;
+
     ParsedQuery();
     void clear();
 };
@@ -122,6 +126,7 @@ bool syntacticParseSELECTION();
 bool syntacticParseSORT();
 bool syntacticParseSOURCE();
 bool syntacticParseTRANSPOSE();
+bool syntacticParseINSERT() ;
 
 bool isFileExists(string tableName);
 bool isQueryFile(string fileName);

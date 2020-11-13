@@ -17,3 +17,4 @@ bool semanticParseSELECTION();
 bool semanticParseSORT();
 bool semanticParseSOURCE();
 bool semanticParseTRANSPOSE();
+bool semanticParseINSERT() ;

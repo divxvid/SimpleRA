@@ -91,7 +91,9 @@ void executeINDEX()
 			++i ;
 		}	
 	}
+	table->indexed = true ;
 	table->indexedColumn = parsedQuery.indexColumnName ;	
+	table->indexingStrategy = BTREE ;
 	indexedColumns[make_pair(parsedQuery.indexRelationName, parsedQuery.indexColumnName)] = index ;
 	cout << "INDEX CREATION SUCCESSFUL" << endl ;
 	default_fanout = 10 ; //resetting it back to it's default.
