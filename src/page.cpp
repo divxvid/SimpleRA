@@ -98,3 +98,20 @@ void Page::writePage()
     }
     fout.close();
 }
+
+void Page::appendRow(vector<int> row)
+{
+	logger.log("Page::appendRow");
+	/*
+	cout << "Rows size " << this->rows.size() << '\n' ;
+	for(int i = 0 ; i < this->columnCount; ++i)
+		this->rows[this->rowCount][i] = row[i] ;
+	this->rowCount++ ;
+	*/
+	if(this->rows.size() < this->rowCount)
+	{
+		this->rows.push_back(row) ;
+	} else this->rows[this->rowCount] = row; 
+	this->rowCount++ ;
+	this->writePage(); 
+}

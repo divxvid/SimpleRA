@@ -118,3 +118,21 @@ void BufferManager::deleteFile(string tableName, int pageIndex)
     string fileName = "../data/temp/"+tableName + "_Page" + to_string(pageIndex);
     this->deleteFile(fileName);
 }
+
+void BufferManager::appendRowToPage(string tableName, int pageIndex, vector<int> row)
+{
+	logger.log("BufferManager::appendRowToPage") ;
+    string pageName = "../data/temp/"+tableName + "_Page" + to_string(pageIndex);
+    if (!this->inPool(pageName))
+	{
+        this->insertIntoPool(tableName, pageIndex);
+	}
+	for (auto& page : this->pages)
+	{
+		if (pageName == page.pageName)
+		{
+			page.appendRow(row) ;
+			break ;
+		}
+	}
+}

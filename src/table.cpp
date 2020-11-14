@@ -335,3 +335,33 @@ int Table::getColumnIndex(string columnName)
             return columnCounter;
     }
 }
+
+void Table::insertRow(vector<int> row)
+{
+	logger.log("Table::insertRow");
+	this->writeRow<int>(row) ;	
+	/*
+	for(int i = 0 ; i < row.size(); ++i)
+	{
+		this->distinctValuesInColumns[i].insert(row[i]); //is a bit weird but ok.
+		this->distinctValuesPerColumnCount[i] = this->distinctValuesInColumns[i].size() ;
+	}
+	*/
+	
+	logger.log("ok till here") ;
+	if(this->rowCount % this->maxRowsPerBlock == 0)
+	{
+		logger.log("Creating a new page!") ;
+		vector<vector<int>> tbr ;
+		tbr.push_back(row) ;
+		bufferManager.writePage(this->tableName, blockCount, tbr, 1);	
+		blockCount++ ;
+		this->rowsPerBlockCount.push_back(1) ;
+		this->rowCount++ ;
+		return ;
+	}
+	this->rowCount++ ;
+	this->rowsPerBlockCount[blockCount-1]++ ;
+	//inserting a new page here or appending a row to the last page.
+	bufferManager.appendRowToPage(this->tableName, blockCount-1, row);
+}

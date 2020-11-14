@@ -13,6 +13,7 @@ bool syntacticParseINSERT()
     }
     parsedQuery.queryType = INSERT;
     parsedQuery.insertionRelationName = tokenizedQuery[2];
+	parsedQuery.insertionValues.clear() ;
 	for(int i = 4; i < tokenizedQuery.size(); ++i)
 		parsedQuery.insertionValues.push_back(tokenizedQuery[i]) ;
     return true;
@@ -39,6 +40,8 @@ bool semanticParseINSERT()
 	}
 	if(parsedQuery.insertionValues.size() != tableCatalogue.getTable(parsedQuery.insertionRelationName)->columnCount)
 	{
+		cout << "Number of values provided :" << parsedQuery.insertionValues.size() << endl; 
+		cout << "Number of values expected :" << tableCatalogue.getTable(parsedQuery.insertionRelationName)->columnCount << endl;
 		cout << "SEMANTIC ERROR: The number of values begin inserted is not equal to the number of columns in the Relation\n" ;
 		return false ;
 	}
@@ -51,8 +54,9 @@ void executeINSERT()
 	Table* table = tableCatalogue.getTable(parsedQuery.insertionRelationName) ;
 	vector<int> row ;
 	for(const string& s : parsedQuery.insertionValues)
+	{
 		row.push_back(stoi(s)) ;
-	table->writeRow<int>(row) ;
-	// TODO: write into the page and index as well.
+	}
+	table->insertRow(row) ;
     return;
 }
