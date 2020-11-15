@@ -355,13 +355,13 @@ void Table::insertRow(vector<int> row)
 		vector<vector<int>> tbr ;
 		tbr.push_back(row) ;
 		bufferManager.writePage(this->tableName, blockCount, tbr, 1);	
-		blockCount++ ;
+		this->blockCount++ ;
 		this->rowsPerBlockCount.push_back(1) ;
 		this->rowCount++ ;
 		return ;
 	}
 	this->rowCount++ ;
-	this->rowsPerBlockCount[blockCount-1]++ ;
+	this->rowsPerBlockCount[this->blockCount-1]++ ;
 	//inserting a new page here or appending a row to the last page.
 	bufferManager.appendRowToPage(this->tableName, blockCount-1, row);
 }

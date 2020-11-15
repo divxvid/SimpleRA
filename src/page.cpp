@@ -108,10 +108,13 @@ void Page::appendRow(vector<int> row)
 		this->rows[this->rowCount][i] = row[i] ;
 	this->rowCount++ ;
 	*/
-	if(this->rows.size() < this->rowCount)
+	/*
+	if(this->rows.size() <= this->rowCount)
 	{
 		this->rows.push_back(row) ;
 	} else this->rows[this->rowCount] = row; 
+	*/
+	this->rows[this->rowCount] = row ;
 	this->rowCount++ ;
 	this->writePage(); 
 }
