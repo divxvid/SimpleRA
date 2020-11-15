@@ -27,4 +27,5 @@ class Page{
     vector<int> getRow(int rowIndex);
     void writePage();
 	void appendRow(vector<int> row);
+	void deleteRow(vector<int> row);
 };

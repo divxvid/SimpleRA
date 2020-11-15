@@ -349,7 +349,8 @@ void Table::insertRow(vector<int> row)
 	*/
 	
 	logger.log("ok till here") ;
-	if(this->rowCount % this->maxRowsPerBlock == 0)
+	//if(this->rowCount % this->maxRowsPerBlock == 0)
+	if(this->rowsPerBlockCount[this->blockCount-1] == this->maxRowsPerBlock)
 	{
 		logger.log("Creating a new page!") ;
 		vector<vector<int>> tbr ;
@@ -360,8 +361,54 @@ void Table::insertRow(vector<int> row)
 		this->rowCount++ ;
 		return ;
 	}
-	this->rowCount++ ;
-	this->rowsPerBlockCount[this->blockCount-1]++ ;
 	//inserting a new page here or appending a row to the last page.
 	bufferManager.appendRowToPage(this->tableName, blockCount-1, row);
+	this->rowCount++ ;
+	this->rowsPerBlockCount[this->blockCount-1]++ ;
+}
+
+void Table::deleteRow(vector<int> row)
+{
+	logger.log("Table::deleteRow");
+	//TODO : I have to manually delete it from the csv file.
+	
+	Cursor cursor = this->getCursor() ;	
+	vector<int> page_row = cursor.getNext() ;
+	int index = 0 ;
+	while(!page_row.empty() && row != page_row)
+	{
+		page_row = cursor.getNext() ;
+		++index ;
+	}
+
+	if(index == this->rowCount) return ;
+
+	int pageIndex = -1 ;
+	int s = 0 ;
+	for(int i = 0 ; i < this->blockCount; ++i)
+	{
+		s += this->rowsPerBlockCount[i] ;		
+		if(s > index)
+		{
+			pageIndex = i ;
+			this->rowsPerBlockCount[i]-- ;
+			this->rowCount-- ;
+			break ;	
+		}
+	}
+	bufferManager.deleteRowFromPage(this->tableName, pageIndex, row);
+    ofstream fout(this->sourceFileName, ios::out);
+    uint count = this->rowCount;
+
+    //print headings
+    this->writeRow(this->columns, fout);
+
+    Cursor rewrite_cursor(this->tableName, 0);
+    vector<int> r;
+    for (int rowCounter = 0; rowCounter < count; rowCounter++)
+    {
+        r = rewrite_cursor.getNext();
+        this->writeRow(r, fout);
+    }
+	fout.close();
 }

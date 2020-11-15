@@ -20,6 +20,7 @@ enum QueryType
     SOURCE,
 	TRANSPOSE,
 	INSERT,
+	DELETE,
     UNDETERMINED
 };
 
@@ -106,6 +107,9 @@ public:
 	string insertionRelationName = "";
 	vector<string> insertionValues ;
 
+	string deletionRelationName = "";
+	vector<string> deletionValues ;
+
     ParsedQuery();
     void clear();
 };
@@ -127,6 +131,7 @@ bool syntacticParseSORT();
 bool syntacticParseSOURCE();
 bool syntacticParseTRANSPOSE();
 bool syntacticParseINSERT() ;
+bool syntacticParseDELETE() ;
 
 bool isFileExists(string tableName);
 bool isQueryFile(string fileName);

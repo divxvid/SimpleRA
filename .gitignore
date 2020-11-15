@@ -1,2 +1,6 @@
 *.o
 ^.vscode*
+*.exe
+*~
+src/log
+src/server

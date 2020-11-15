@@ -39,6 +39,7 @@ Page::Page(string tableName, int pageIndex)
 
     ifstream fin(pageName, ios::in);
     this->rowCount = table.rowsPerBlockCount[pageIndex];
+	logger.log("Row Count Read : "+to_string(this->rowCount));
     int number;
     for (uint rowCounter = 0; rowCounter < this->rowCount; rowCounter++)
     {
@@ -103,7 +104,6 @@ void Page::appendRow(vector<int> row)
 {
 	logger.log("Page::appendRow");
 	/*
-	cout << "Rows size " << this->rows.size() << '\n' ;
 	for(int i = 0 ; i < this->columnCount; ++i)
 		this->rows[this->rowCount][i] = row[i] ;
 	this->rowCount++ ;
@@ -114,7 +114,33 @@ void Page::appendRow(vector<int> row)
 		this->rows.push_back(row) ;
 	} else this->rows[this->rowCount] = row; 
 	*/
-	this->rows[this->rowCount] = row ;
-	this->rowCount++ ;
+	if(this->rows.size() == this->rowCount)
+	{
+		this->rows.push_back(row) ;	
+		this->rowCount++ ;
+	} else	
+	{
+		this->rows[this->rowCount] = row ;
+		this->rowCount++ ;
+	}
 	this->writePage(); 
+}
+
+void Page::deleteRow(vector<int> row)
+{
+	logger.log("Page::deleteRow");
+	/*
+	for(auto it = rows.begin(); it != rows.end(); ++it)
+	{
+		if(*it == row)
+		{
+			rows.erase(it) ;
+			this->rowCount-- ;
+			break ;
+		}
+	}*/	
+	this->rows.erase(find(this->rows.begin(), this->rows.end(), row));
+	this->rowCount-- ;
+
+	this->writePage() ;
 }

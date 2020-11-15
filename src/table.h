@@ -51,6 +51,7 @@ public:
     int getColumnIndex(string columnName);
     void unload();
 	void insertRow(vector<int> row);
+	void deleteRow(vector<int> row);
 
     /**
  * @brief Static function that takes a vector of valued and prints them out in a

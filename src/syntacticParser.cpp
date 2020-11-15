@@ -31,6 +31,8 @@ bool syntacticParse()
 		return syntacticParseTRANSPOSE();
 	else if(possibleQueryType == "INSERT")
 		return syntacticParseINSERT() ;
+	else if(possibleQueryType == "DELETE")
+		return syntacticParseDELETE() ;
     else
     {
         string resultantRelationName = possibleQueryType;
@@ -118,6 +120,12 @@ void ParsedQuery::clear()
     this->sortRelationName = "";
 
     this->sourceFileName = "";
+
+	this->insertionRelationName = "" ;
+	this->insertionValues.clear() ;
+	
+	this->deletionRelationName = "";
+	this->deletionValues.clear() ;
 }
 
 /**
