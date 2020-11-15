@@ -21,6 +21,7 @@ bool semanticParse(){
 		case INSERT: return semanticParseINSERT() ;
 		case DELETE: return semanticParseDELETE() ;
 		case BULK_INSERT: return semanticParseBULK_INSERT() ;
+		case GROUP_BY: return semanticParseGROUP_BY() ;
         default: cout<<"SEMANTIC ERROR"<<endl;
     }
 

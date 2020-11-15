@@ -22,6 +22,7 @@ enum QueryType
 	INSERT,
 	DELETE,
 	BULK_INSERT,
+	GROUP_BY,
     UNDETERMINED
 };
 
@@ -48,6 +49,15 @@ enum SelectType
     COLUMN,
     INT_LITERAL,
     NO_SELECT_CLAUSE
+};
+
+enum AggregateFunction
+{
+	MAX,
+	MIN,
+	AVG,
+	SUM,
+	NONE
 };
 
 class ParsedQuery
@@ -113,6 +123,12 @@ public:
 
 	string bulkInsertFileName = "" ;
 	string bulkInsertRelationName = "" ;
+	
+	string groupByResultantRelationName = "" ;
+	string groupByRelationName = "" ;
+	string groupByGroupingAttribute = "" ;
+	AggregateFunction groupByAggregateFunction = NONE ;
+	string groupByAggregationAttribute = "" ;
 
     ParsedQuery();
     void clear();
@@ -137,6 +153,7 @@ bool syntacticParseTRANSPOSE();
 bool syntacticParseINSERT() ;
 bool syntacticParseDELETE() ;
 bool syntacticParseBULK_INSERT() ;
+bool syntacticParseGROUP_BY() ;
 
 bool isFileExists(string tableName);
 bool isQueryFile(string fileName);

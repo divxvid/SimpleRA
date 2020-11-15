@@ -21,6 +21,7 @@ void executeCommand(){
 		case INSERT: executeINSERT(); break ;
 		case DELETE: executeDELETE(); break ;
 		case BULK_INSERT: executeBULK_INSERT(); break ;
+		case GROUP_BY: executeGROUP_BY(); break ;
         default: cout<<"PARSING ERROR"<<endl;
     }
 

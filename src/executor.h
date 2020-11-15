@@ -20,6 +20,7 @@ void executeTRANSPOSE();
 void executeINSERT() ;
 void executeDELETE() ;
 void executeBULK_INSERT() ;
+void executeGROUP_BY() ;
 
 bool evaluateBinOp(int value1, int value2, BinaryOperator binaryOperator);
 void printRowCount(int rowCount);
