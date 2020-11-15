@@ -21,6 +21,7 @@ enum QueryType
 	TRANSPOSE,
 	INSERT,
 	DELETE,
+	BULK_INSERT,
     UNDETERMINED
 };
 
@@ -110,6 +111,9 @@ public:
 	string deletionRelationName = "";
 	vector<string> deletionValues ;
 
+	string bulkInsertFileName = "" ;
+	string bulkInsertRelationName = "" ;
+
     ParsedQuery();
     void clear();
 };
@@ -132,6 +136,7 @@ bool syntacticParseSOURCE();
 bool syntacticParseTRANSPOSE();
 bool syntacticParseINSERT() ;
 bool syntacticParseDELETE() ;
+bool syntacticParseBULK_INSERT() ;
 
 bool isFileExists(string tableName);
 bool isQueryFile(string fileName);

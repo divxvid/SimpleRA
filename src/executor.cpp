@@ -20,6 +20,7 @@ void executeCommand(){
 		case TRANSPOSE: executeTRANSPOSE(); break ;
 		case INSERT: executeINSERT(); break ;
 		case DELETE: executeDELETE(); break ;
+		case BULK_INSERT: executeBULK_INSERT(); break ;
         default: cout<<"PARSING ERROR"<<endl;
     }
 

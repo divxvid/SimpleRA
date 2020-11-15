@@ -19,3 +19,4 @@ bool semanticParseSOURCE();
 bool semanticParseTRANSPOSE();
 bool semanticParseINSERT() ;
 bool semanticParseDELETE() ;
+bool semanticParseBULK_INSERT() ;

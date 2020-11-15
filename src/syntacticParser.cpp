@@ -33,6 +33,8 @@ bool syntacticParse()
 		return syntacticParseINSERT() ;
 	else if(possibleQueryType == "DELETE")
 		return syntacticParseDELETE() ;
+	else if(possibleQueryType == "BULK_INSERT")
+		return syntacticParseBULK_INSERT() ;
     else
     {
         string resultantRelationName = possibleQueryType;
@@ -126,6 +128,9 @@ void ParsedQuery::clear()
 	
 	this->deletionRelationName = "";
 	this->deletionValues.clear() ;
+
+	this->bulkInsertFileName = "" ;
+	this->bulkInsertRelationName = "" ;
 }
 
 /**
