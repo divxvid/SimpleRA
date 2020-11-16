@@ -440,3 +440,46 @@ void Table::addColumn(string columnName)
 	logger.log("Table::addColumn : Deleted older Pages") ;
 	this->blockify() ;
 }
+
+void Table::removeColumn(string columnName)
+{
+	logger.log("Table::removeColumn") ;
+
+	ofstream trunc_file(this->sourceFileName, ofstream::out | ofstream::trunc) ;
+	trunc_file.close() ;
+	vector<string> temp_cols = this->columns ;
+	auto it = find(temp_cols.begin(), temp_cols.end(), columnName) ;
+	int col_index = it - temp_cols.begin() ;
+	temp_cols.erase(it) ;
+
+	this->writeRow(temp_cols) ;
+	Cursor cursor = this->getCursor() ;
+	vector<int> row = cursor.getNext() ;
+	while(!row.empty())
+	{
+		vector<int> new_row ;
+		for(int i = 0 ; i < row.size(); ++i)
+		{
+			if(i == col_index) continue ;
+			new_row.push_back(row[i]) ;
+		}
+		this->writeRow(new_row) ;
+		row = cursor.getNext() ;
+	}
+
+	logger.log("Table::removeColumn : Rewritten original csv file.") ;
+	
+	//delete older pages.
+	for(int i = 0; i < this->blockCount; ++i)
+	{
+		bufferManager.deleteFile(this->tableName, i) ;
+	}	
+	this->blockCount = 0 ;
+	this->rowsPerBlockCount.clear() ;
+	this->columns = temp_cols ;
+    this->columnCount = this->columns.size();
+    this->maxRowsPerBlock = (uint)((BLOCK_SIZE * 1000) / (32 * columnCount));
+	this->rowCount = 0 ;
+	logger.log("Table::removeColumn : Deleted older Pages") ;
+	this->blockify() ;
+}

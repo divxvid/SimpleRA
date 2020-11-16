@@ -52,6 +52,7 @@ void executeALTER()
 	} else
 	{
 		//code for deleting a column from the table.	
+		table->removeColumn(parsedQuery.alterColumnName) ;
 	}
     return;
 }

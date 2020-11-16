@@ -53,6 +53,7 @@ public:
 	void insertRow(vector<int> row);
 	void deleteRow(vector<int> row);
 	void addColumn(string columnName) ;
+	void removeColumn(string columnName) ;
 
     /**
  * @brief Static function that takes a vector of valued and prints them out in a
