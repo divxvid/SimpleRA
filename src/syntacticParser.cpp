@@ -35,6 +35,8 @@ bool syntacticParse()
 		return syntacticParseDELETE() ;
 	else if(possibleQueryType == "BULK_INSERT")
 		return syntacticParseBULK_INSERT() ;
+	else if(possibleQueryType == "ALTER")
+		return syntacticParseALTER() ;
     else
     {
         string resultantRelationName = possibleQueryType;
@@ -139,6 +141,10 @@ void ParsedQuery::clear()
 	this->groupByGroupingAttribute = "" ;
 	this->groupByAggregateFunction = NONE ;
 	this->groupByAggregationAttribute = "" ;
+	
+	this->alterRelationName = "" ;
+	this->alterColumnName = "" ;
+	this->alterOperation = "" ;
 }
 
 /**

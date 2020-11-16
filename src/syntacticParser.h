@@ -23,6 +23,7 @@ enum QueryType
 	DELETE,
 	BULK_INSERT,
 	GROUP_BY,
+	ALTER,
     UNDETERMINED
 };
 
@@ -130,6 +131,10 @@ public:
 	AggregateFunction groupByAggregateFunction = NONE ;
 	string groupByAggregationAttribute = "" ;
 
+	string alterRelationName = "" ;
+	string alterColumnName = "" ;
+	string alterOperation = "" ;
+
     ParsedQuery();
     void clear();
 };
@@ -154,6 +159,7 @@ bool syntacticParseINSERT() ;
 bool syntacticParseDELETE() ;
 bool syntacticParseBULK_INSERT() ;
 bool syntacticParseGROUP_BY() ;
+bool syntacticParseALTER() ;
 
 bool isFileExists(string tableName);
 bool isQueryFile(string fileName);

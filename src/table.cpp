@@ -340,16 +340,7 @@ void Table::insertRow(vector<int> row)
 {
 	logger.log("Table::insertRow");
 	this->writeRow<int>(row) ;	
-	/*
-	for(int i = 0 ; i < row.size(); ++i)
-	{
-		this->distinctValuesInColumns[i].insert(row[i]); //is a bit weird but ok.
-		this->distinctValuesPerColumnCount[i] = this->distinctValuesInColumns[i].size() ;
-	}
-	*/
-	
-	logger.log("ok till here") ;
-	//if(this->rowCount % this->maxRowsPerBlock == 0)
+
 	if(this->rowsPerBlockCount[this->blockCount-1] == this->maxRowsPerBlock)
 	{
 		logger.log("Creating a new page!") ;
@@ -358,12 +349,12 @@ void Table::insertRow(vector<int> row)
 		bufferManager.writePage(this->tableName, blockCount, tbr, 1);	
 		this->blockCount++ ;
 		this->rowsPerBlockCount.push_back(1) ;
-		this->rowCount++ ;
+		this->updateStatistics(row) ;
 		return ;
 	}
 	//inserting a new page here or appending a row to the last page.
 	bufferManager.appendRowToPage(this->tableName, blockCount-1, row);
-	this->rowCount++ ;
+	this->updateStatistics(row) ;
 	this->rowsPerBlockCount[this->blockCount-1]++ ;
 }
 
@@ -411,4 +402,41 @@ void Table::deleteRow(vector<int> row)
         this->writeRow(r, fout);
     }
 	fout.close();
+}
+
+
+void Table::addColumn(string columnName)
+{
+	logger.log("Table::addColumn") ;
+
+	ofstream trunc_file(this->sourceFileName, ofstream::out | ofstream::trunc) ;
+	trunc_file.close() ;
+	vector<string> temp_cols = this->columns ;
+	temp_cols.push_back(columnName) ;
+
+	this->writeRow(temp_cols) ;
+	Cursor cursor = this->getCursor() ;
+	vector<int> row = cursor.getNext() ;
+	while(!row.empty())
+	{
+		row.push_back(0) ; // for the new column.
+		this->writeRow(row) ;
+		row = cursor.getNext() ;
+	}
+
+	logger.log("Table::addColumn : Rewritten original csv file.") ;
+	
+	//delete older pages.
+	for(int i = 0; i < this->blockCount; ++i)
+	{
+		bufferManager.deleteFile(this->tableName, i) ;
+	}	
+	this->blockCount = 0 ;
+	this->rowsPerBlockCount.clear() ;
+	this->columns.push_back(columnName) ;
+    this->columnCount = this->columns.size();
+    this->maxRowsPerBlock = (uint)((BLOCK_SIZE * 1000) / (32 * columnCount));
+	this->rowCount = 0 ;
+	logger.log("Table::addColumn : Deleted older Pages") ;
+	this->blockify() ;
 }

@@ -21,3 +21,4 @@ bool semanticParseINSERT() ;
 bool semanticParseDELETE() ;
 bool semanticParseBULK_INSERT() ;
 bool semanticParseGROUP_BY() ;
+bool semanticParseALTER() ;
