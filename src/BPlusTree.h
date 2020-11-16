@@ -71,6 +71,10 @@ public:
 	{
 		delete_nodes(root) ;
 	}
+	int get_current_fanout()
+	{
+		return internal_fanout ;
+	}
 	/*
 	 * This is a public function that takes in a key and a value, and uses the private
 	 * insert function to insert value value. If the root has overflown, this function is
