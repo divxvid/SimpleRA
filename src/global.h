@@ -10,4 +10,4 @@ extern vector<string> tokenizedQuery;
 extern ParsedQuery parsedQuery;
 extern TableCatalogue tableCatalogue;
 extern BufferManager bufferManager;
-extern map<pair<string, string>, BPlusTree*> indexedColumns ;
+extern map<string, pair<string, BPlusTree*>> indexedColumns ;

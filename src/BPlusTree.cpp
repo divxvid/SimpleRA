@@ -1,6 +1,6 @@
 #include "global.h" 
 
-map<pair<string, string>, BPlusTree*> indexedColumns ;
+map<string, pair<string, BPlusTree*>> indexedColumns ;
 int BPlusTree::size()
 {
 	return number_of_elements ;
@@ -28,7 +28,7 @@ void BPlusTree::reconstruct()
 	cout << "RECONSTRUCTION\n" ;
 }
 
-void BPlusTree::erase_p(BPlusNode* node, int key)
+void BPlusTree::erase_p(BPlusNode* node, int key, vector<int> row)
 {
 	if(node == nullptr)
 		return ;
@@ -39,20 +39,72 @@ void BPlusTree::erase_p(BPlusNode* node, int key)
 		if(pos == node->keys.end() || *pos != key)
 			return ;
 		int index = pos - node->keys.begin() ;
+		/*
 		node->keys.erase(node->keys.begin()+index);
 		node->values.erase(node->values.begin()+index);
+		*/
+		bool found = false ;
+		for(int i = index; i < node->keys.size(); ++i)
+		{
+			if(node->keys[i] != key) break ;
+			if(node->values[i] == row)
+			{
+				node->keys.erase(node->keys.begin()+i);
+				node->values.erase(node->values.begin()+i);
+				found = true ;
+				break ;
+			}
+		}
+		if(!found)
+		{
+			BPlusNode* next_node = node->next ;
+			while(!found && next_node != nullptr && next_node->keys[0] == key)
+			{
+				for(int i = 0; i < next_node->keys.size(); ++i)
+				{
+					if(next_node->keys[i] != key) break ;
+					if(next_node->values[i] == row)
+					{
+						next_node->keys.erase(next_node->keys.begin()+i);
+						next_node->values.erase(next_node->values.begin()+i);
+						found = true ;
+						break ;
+					}
+				}
+				next_node = next_node->next ;
+			}
+		}
+		if(!found)
+		{
+			BPlusNode* prev_node = node->next ;
+			while(!found && prev_node != nullptr && prev_node->keys.back() == key)
+			{
+				for(int i = prev_node->keys.size()-1; i >= 0; --i)
+				{
+					if(prev_node->keys[i] != key) break ;
+					if(prev_node->values[i] == row)
+					{
+						prev_node->keys.erase(prev_node->keys.begin()+i);
+						prev_node->values.erase(prev_node->values.begin()+i);
+						found = true ;
+						break ;
+					}
+				}
+				prev_node = prev_node->prev ;
+			}
+		}
 		this->number_of_elements-- ;
 		this->numbers_deleted++ ;
 		return ;
 	}
 
 	int pos = upper_bound(node->keys.begin(), node->keys.end(), key) - node->keys.begin() ;
-	erase_p(node->children[pos], key) ;
+	erase_p(node->children[pos], key, row) ;
 }
 
-void BPlusTree::erase(int key)
+void BPlusTree::erase(int key, vector<int> row)
 {
-	erase_p(root, key) ;
+	erase_p(root, key, row) ;
 
 	/*
 	if(number_of_elements < maximal_elements_reached/2)
@@ -71,16 +123,16 @@ void BPlusTree::erase(int key)
 	}
 }
 
-pair<int, int> BPlusTree::get_p(BPlusNode* node, int key)
+vector<int> BPlusTree::get_p(BPlusNode* node, int key)
 {
 	if(node == nullptr)
-		return {-1, -1} ;
+		return {} ;
 
 	if(node->is_leaf)
 	{
 		auto pos = lower_bound(node->keys.begin(), node->keys.end(), key) ;
 		if(pos == node->keys.end() || *pos != key)
-			return {-1, -1} ;
+			return {} ;
 		int index = pos - node->keys.begin() ;
 		return node->values[index] ;
 	}
@@ -88,7 +140,7 @@ pair<int, int> BPlusTree::get_p(BPlusNode* node, int key)
 	return get_p(node->children[pos], key) ;
 }
 
-pair<int ,int> BPlusTree::get(int key)
+vector<int> BPlusTree::get(int key)
 {
 	return get_p(root, key) ;
 }
@@ -101,13 +153,14 @@ void BPlusTree::print_content_reverse()
 	if(trav == nullptr)
 		return ;
 
+	/*
 	while(trav != nullptr)
 	{
 		for(int i = trav->keys.size()-1; i >= 0; --i)
 			cout << trav->keys[i] << " <" << trav->values[i].first << ' ' << trav->values[i].second << ">\n" ;
 
 		trav = trav->prev ;
-	}
+	}*/
 }
 
 void BPlusTree::print_content()
@@ -118,6 +171,7 @@ void BPlusTree::print_content()
 	if(trav == nullptr)
 		return ;
 
+	/*
 	while(trav != nullptr)
 	{
 		for(int i = 0; i < trav->keys.size(); ++i)
@@ -125,6 +179,7 @@ void BPlusTree::print_content()
 
 		trav = trav->next ;
 	}
+	*/
 }
 
 BPlusNode* BPlusTree::getForwardRecordIterator()
@@ -188,7 +243,7 @@ void BPlusTree::delete_nodes(BPlusNode* node)
 	delete node ;
 }
 
-BPlusNode* BPlusTree::insert_p(BPlusNode* node, int key, pair<int, int> value)
+BPlusNode* BPlusTree::insert_p(BPlusNode* node, int key, vector<int> value)
 {
 	//If we need to allocate a new node.
 	if(node == nullptr)
@@ -306,7 +361,7 @@ BPlusNode* BPlusTree::insert_p(BPlusNode* node, int key, pair<int, int> value)
 	return node ;
 }
 
-void BPlusTree::insert(int key, pair<int ,int> value)
+void BPlusTree::insert(int key, vector<int> value)
 {
 	BPlusNode* child = insert_p(root, key, value) ;		
 	this->root = child ;

@@ -354,8 +354,18 @@ void Table::insertRow(vector<int> row)
 	}
 	//inserting a new page here or appending a row to the last page.
 	bufferManager.appendRowToPage(this->tableName, blockCount-1, row);
-	this->updateStatistics(row) ;
+	//this->updateStatistics(row) ;
+	this->rowCount++ ;
 	this->rowsPerBlockCount[this->blockCount-1]++ ;
+	
+	if(this->indexed)
+	{
+		int col_idx = this->getColumnIndex(this->indexedColumn) ;
+		BPlusTree* index = indexedColumns[this->tableName].second ;
+		int key = row[col_idx] ;
+		index->insert(key, row) ;
+		logger.log("Table::insertRow : Row added to the index.") ;
+	}
 }
 
 void Table::deleteRow(vector<int> row)
@@ -402,6 +412,14 @@ void Table::deleteRow(vector<int> row)
         this->writeRow(r, fout);
     }
 	fout.close();
+	if(this->indexed)
+	{
+		int col_idx = this->getColumnIndex(this->indexedColumn) ;
+		BPlusTree* index = indexedColumns[this->tableName].second ;
+		int key = row[col_idx] ;
+		index->erase(key, row) ;
+		logger.log("Table::deleteRow : Row deleted from the index.") ;
+	}
 }
 
 

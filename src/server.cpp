@@ -64,6 +64,6 @@ int main(void)
 
 	for(auto it = indexedColumns.begin(); it != indexedColumns.end(); ++it)
 	{
-		delete it->second ;
+		delete (it->second).second ;
 	}
 }

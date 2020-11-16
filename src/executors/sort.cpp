@@ -274,21 +274,20 @@ void executeSORT(){
     bool is_ascending = parsedQuery.sortingStrategy == ASC ;
 
     Table* resultantTable = new Table(parsedQuery.sortResultRelationName, columns);
-	auto it = indexedColumns.find(make_pair(parsedQuery.sortRelationName, parsedQuery.sortColumnName));
-	if(it != indexedColumns.end())
+	auto it = indexedColumns.find(parsedQuery.sortRelationName);
+	if(it != indexedColumns.end() && (it->second).first == parsedQuery.sortColumnName)
 	{
 		cout << "USING INDEX TO SORT" << endl ;
-		BPlusTree* tree = it->second ;
+		BPlusTree* tree = (it->second).second ;
 		BPlusNode* itr ;
 		if(is_ascending)
 		{
 			itr = tree->getForwardRecordIterator() ;
 			while(itr != nullptr)
 			{
-				for(pair<int, int>& p : itr->values)
+				for(vector<int>& p : itr->values)
 				{
-					Page page = bufferManager.getPage(parsedQuery.sortRelationName, p.first);	
-					resultantTable->writeRow<int>(page.getRow(p.second));
+					resultantTable->writeRow<int>(p);
 				}
 				itr = tree->next(itr, is_ascending);
 			}
@@ -299,9 +298,8 @@ void executeSORT(){
 			{
 				for(int i = itr->values.size()-1; i >= 0; --i)
 				{
-					pair<int, int>& p = itr->values[i] ;
-					Page page = bufferManager.getPage(parsedQuery.sortRelationName, p.first);	
-					resultantTable->writeRow<int>(page.getRow(p.second));
+					vector<int>& p = itr->values[i] ;
+					resultantTable->writeRow<int>(p);
 				}
 				itr = tree->next(itr, is_ascending);
 			}

@@ -2,7 +2,7 @@
 /**
  * @brief 
  * SYNTAX: INDEX ON column_name FROM relation_name USING indexing_strategy
- * indexing_strategy: ASC | DESC | NOTHING
+ * indexing_strategy: HASH | BTREE | NOTHING
  */
 
 // TODO : If the table is already indexed, then do something about it .
@@ -78,6 +78,7 @@ void executeINDEX()
 			break ;
 		}
 	}
+	/*
 	for(int page_number = 0; page_number < num_pages; ++page_number)
 	{
 		Page page = bufferManager.getPage(parsedQuery.indexRelationName, page_number);
@@ -91,10 +92,23 @@ void executeINDEX()
 			++i ;
 		}	
 	}
+	*/
+
+	Cursor cursor = table->getCursor() ;
+	vector<int> row = cursor.getNext() ;
+	while(!row.empty())
+	{
+		int key = row[col_idx] ;
+		index->insert(key, row) ;
+
+		row = cursor.getNext() ;
+	}
+
 	table->indexed = true ;
 	table->indexedColumn = parsedQuery.indexColumnName ;	
 	table->indexingStrategy = BTREE ;
-	indexedColumns[make_pair(parsedQuery.indexRelationName, parsedQuery.indexColumnName)] = index ;
+	//indexedColumns[make_pair(parsedQuery.indexRelationName, parsedQuery.indexColumnName)] = index ;
+	indexedColumns[parsedQuery.indexRelationName] = make_pair(parsedQuery.indexColumnName, index) ;
 	cout << "INDEX CREATION SUCCESSFUL" << endl ;
 	default_fanout = 10 ; //resetting it back to it's default.
     return;

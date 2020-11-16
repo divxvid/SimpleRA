@@ -10,7 +10,7 @@ struct BPlusNode
 	vector<BPlusNode*> children ; // to store the children of internal nodes.
 	//The values are of the form <page number> <row number> to locate a particular record
 	//Pages can be accessed using the page number in the BufferManager class, and within the page class we can access each row using the row number.
-	vector<pair<int, int>> values ; // to store the values in the leaf nodes.
+	vector<vector<int>> values ; // to store the values in the leaf nodes.
 
 	BPlusNode* next; // for the leaf doubly linked list
 	BPlusNode* prev;
@@ -42,11 +42,11 @@ class BPlusTree
 	 * return a boolean value that decides whether the node where the insert
 	 * is done has overflowed or not. If It has overflowed, then it needs to be split
 	 * */
-	BPlusNode* insert_p(BPlusNode*, int key, pair<int, int> value) ;
+	BPlusNode* insert_p(BPlusNode*, int key, vector<int> value) ;
 	void delete_nodes(BPlusNode*) ;
 	void traverse_p(BPlusNode*) ;
-	pair<int, int> get_p(BPlusNode*, int) ;
-	void erase_p(BPlusNode*, int key) ;
+	vector<int> get_p(BPlusNode*, int) ;
+	void erase_p(BPlusNode*, int key, vector<int> row) ;
 	void reconstruct() ;
 public:
 	BPlusTree() 
@@ -76,12 +76,12 @@ public:
 	 * insert function to insert value value. If the root has overflown, this function is
 	 * responsible for creating a new root node.
 	 * */
-	void insert(int key, pair<int, int> value) ;
+	void insert(int key, vector<int> value) ;
 	void traverse() ;
 	void print_content() ;
 	void print_content_reverse() ;
-	pair<int, int> get(int key) ;
-	void erase(int key) ;
+	vector<int> get(int key) ;
+	void erase(int key, vector<int> row) ;
 	int size() ;
 	BPlusNode* getReverseRecordIterator();
 	BPlusNode* getForwardRecordIterator();
